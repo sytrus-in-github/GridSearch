@@ -229,9 +229,9 @@ class ConstantExtendedRangeIterator(RangeIterator):
         if not self.hasNext():
             return None
         else:
-            return ((self.lconst,) if self.lconst is not None else ()) + \
+            return (tuple(self.lconst) if self.lconst is not None else ()) + \
                    (self.iterator.get(),) + \
-                   ((self.rconst,) if self.rconst is not None else ())
+                   (tuple(self.rconst) if self.rconst is not None else ())
 
     def reset(self):
         return self.iterator.reset()
@@ -253,18 +253,18 @@ class Logger:
     def logBest(self, bestposparams, bestkwparams, bestoutput):
         raise NotImplementedError
 
-    
+
 class DefaultLogger(Logger):
     def __init__(self, name = 'Default Logger'):
         self.results = dict()
         self.best = None
         self.name = str(name)
-    
+
     def initialize(self):
         self.results = dict()
         self.best = None
         print '\n'+self.name, 'starts at', '{:%Y-%m-%d %H:%M:%S}\n\n'.format(datetime.datetime.now())
-        
+
     def update(self, posparams, kwparams, output):
         params = tuple(posparams)+tuple(kwparams.items())
         self.results[params] = output
@@ -306,7 +306,7 @@ class PersistentLogger(Logger):
             print '\nBest:\n', bestparams, ':' , bestoutput
             with open(self.logfile,'a') as logfile:
                 logfile.write('\nBest:\n'+str(bestparams)+' : '+str(bestoutput)+'\n')
-        
+
 
 class Comparer:
     """interface of comparer to use for gridSearch"""
@@ -315,8 +315,8 @@ class Comparer:
     @abstractmethod
     def leftBetterThanRight(self, left, right):
         raise NotImplementedError
-   
-   
+
+
 class DefaultComparer:
     def leftBetterThanRight(self, left, right):
         return left > right
